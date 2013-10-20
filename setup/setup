@@ -80,41 +80,6 @@ fi
 echo "Making initial scope directories"
 source $CONF_SETUP/new_scope
 
-# Add scope to list of scopes
-if [-e $CONF_SETUP/scopes/plat_list]; then
-    if ! grep -q "$PLAT" $CONF_SETUP/scopes/plat_list; then
-        echo "Adding current scope to $CONF_SETUP/scopes/plat_list"
-        mkdir -p $CONF_SETUP/scopes
-        echo $PLAT >> scopes/plat_list
-    fi
-else
-    echo "Adding current scope to $CONF_SETUP/scopes/plat_list"
-    mkdir -p $CONF_SETUP/scopes
-    echo $PLAT >> scopes/plat_list
-fi
-if [-e $CONF_SETUP/scopes/site_list]; then
-    if ! grep -q "$SITE" $CONF_SETUP/scopes/site_list; then
-        echo "Adding current scope to $CONF_SETUP/scopes/site_list"
-        mkdir -p $CONF_SETUP/scopes
-        echo $SITE >> scopes/site_list
-    fi
-else
-    echo "Adding current scope to $CONF_SETUP/scopes/plat_list"
-    mkdir -p $CONF_SETUP/scopes
-    echo $PLAT >> scopes/plat_list
-fi
-if [-e $CONF_SETUP/scopes/host_list]; then
-    if ! grep -q "$HOST" $CONF_SETUP/scopes/host_list; then
-        echo "Adding current scope to $CONF_SETUP/scopes/host_list"
-        mkdir -p $CONF_SETUP/scopes
-        echo $HOST >> scopes/host_list
-    fi
-else
-    echo "Adding current scope to $CONF_SETUP/scopes/plat_list"
-    mkdir -p $CONF_SETUP/scopes
-    echo $PLAT >> scopes/plat_list
-fi
-
 # Copy generic initialization files
 echo "Copying generic initialization files to $CONF/init/"
 cp templates/init/* $CONF/init/
