@@ -1,0 +1,146 @@
+#! /bin/bash
+# Setup a portable configuration system
+#
+# Based on the concepts layed out by Martin Blais
+# http://furius.ca/projects/doc/conf.html
+#
+# Written by Joe Hamman, University of Washington
+# Initial Concept  -  2013-10-18
+
+export CONF=$HOME/p/conf
+export CONF_SETUP=$PWD
+export CONF_LOCAL=$HOME/p/conf-local
+
+# Make main configuration directories
+echo "Making configuration directories"
+source $CONF_SETUP/setup_functions
+
+make_new_dirs $CONF/init/                        # global init files,
+                                                 # include all the scopes
+make_new_dirs $CONF/common/                      # common (shared) scope
+make_new_dirs $CONF_LOCAL/common/                # common stuff, install logs, very local
+
+# redirect dot files to look in $CONF/inixt
+# The dot files that are currently linked are
+# 1.  ~/.profile
+# 2.  ~/.bashrc
+# 3.  ~/.cshrc
+# 4.  ~/.xsession
+for file in profile bashrc cshrc xsession; do
+    # check if file is already a link
+    if [[ -h $HOME/.$file ]]; then
+        echo '$HOME/.$file is already a link, moving on...'
+    else
+        if [[ -e $HOME/.$file ]]; then
+            mkdir -p $HOME/old_dot_files/
+            echo "Moving existing $file to $HOME/old_dot_files/"
+            mv $HOME/.$file $HOME/old_dot_files/$file
+        fi
+        # make the link
+        echo "making $file link: $HOME/.$file --> $CONF/init/profile"
+        ln -s $CONF/init/profile $HOME/.$file
+    fi
+done
+
+# Download $CONF/common/bin files
+wget -O $CONF/common/bin/config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD'
+chmod u+x $CONF/common/bin/config.guess
+
+# Get the Current Scope Variables
+export PLAT=`$CONF/common/bin/config.guess`
+
+# Get the SITE Variable
+if [ -e $HOME/.site ] ; then
+    export SITE=`cat $HOME/.site`
+else
+    if [ -e $CONF_SETUP/scopes/site_list ]; then
+        echo 'Existing sites are: '
+        cat $CONF_SETUP/scopes/site_list
+    fi
+    echo "Please Input the current SITE [main]"
+    read temp_site
+    if [ -z "$temp_site" ] ; then
+        SITE='main'
+    else
+        SITE=$temp_site
+    fi
+    echo $SITE >> $HOME/.site
+fi
+echo "Current SITE is set to: $SITE"
+
+# HOST is set to remove the node number from the hostname idenitfier
+export HOST='host_not_known'
+if [ -e $HOME/.host ] ; then
+    export HOST=`cat $HOME/.host`
+else
+ export HOST=`perl -e'use POSIX qw(uname);$_=(uname)[1];s/\.local$//gi; s/^mg\d.*$/mg/gi;print ($_,"\n")' | cut -f1 -d.`
+fi
+
+# Make initial scope configuration directories
+echo "Making initial scope directories"
+source $CONF_SETUP/new_scope
+
+# Add scope to list of scopes
+if [-e $CONF_SETUP/scopes/plat_list]; then
+    if ! grep -q "$PLAT" $CONF_SETUP/scopes/plat_list; then
+        echo "Adding current scope to $CONF_SETUP/scopes/plat_list"
+        mkdir -p $CONF_SETUP/scopes
+        echo $PLAT >> scopes/plat_list
+    fi
+else
+    echo "Adding current scope to $CONF_SETUP/scopes/plat_list"
+    mkdir -p $CONF_SETUP/scopes
+    echo $PLAT >> scopes/plat_list
+fi
+if [-e $CONF_SETUP/scopes/site_list]; then
+    if ! grep -q "$SITE" $CONF_SETUP/scopes/site_list; then
+        echo "Adding current scope to $CONF_SETUP/scopes/site_list"
+        mkdir -p $CONF_SETUP/scopes
+        echo $SITE >> scopes/site_list
+    fi
+else
+    echo "Adding current scope to $CONF_SETUP/scopes/plat_list"
+    mkdir -p $CONF_SETUP/scopes
+    echo $PLAT >> scopes/plat_list
+fi
+if [-e $CONF_SETUP/scopes/host_list]; then
+    if ! grep -q "$HOST" $CONF_SETUP/scopes/host_list; then
+        echo "Adding current scope to $CONF_SETUP/scopes/host_list"
+        mkdir -p $CONF_SETUP/scopes
+        echo $HOST >> scopes/host_list
+    fi
+else
+    echo "Adding current scope to $CONF_SETUP/scopes/plat_list"
+    mkdir -p $CONF_SETUP/scopes
+    echo $PLAT >> scopes/plat_list
+fi
+
+# Copy generic initialization files
+echo "Copying generic initialization files to $CONF/init/"
+cp templates/init/* $CONF/init/
+
+# Copy setup directory to $HOME/p/setup
+if [ ! -d "$HOME/p/setup/" ]; then
+    cp $CONF_SETUP $HOME/p/setup/
+fi
+
+# Make $HOME/.conf file
+if [ ! -e $HOME/.conf ]; then
+    echo "Creating $HOME/.conf file"
+    cp templates/conf $HOME/.conf
+else
+    echo '.conf file already exists.  Make sure it contains the environmental variables: CONF, CONF_LOCAL, PLAT, SITE, and HOST'
+fi
+
+# Setup Configuration git repository
+if [ ! -d "$HOME/p/.git" ]; then
+    echo "Initializing git repository"
+    cd $HOME/p/
+    git init
+    git add --all
+    git commit -m 'initial commit of config repository'
+fi
+
+# Reload the shell to apply the changes
+exec $SHELL
+echo "Done with setup, your environment has been initialized"

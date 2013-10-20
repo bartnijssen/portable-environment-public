@@ -1,0 +1,18 @@
+#! /bin/bash
+# Setup a new scope ()
+
+source $CONF_SETUP/setup_functions
+
+make_new_dirs $CONF/plat/$PLAT/                       # platform scope
+make_new_dirs $CONF/site/$SITE/                       # site scope
+make_new_dirs $CONF/site/$SITE/plat/$PLAT/            # site and platform scope
+make_new_dirs $CONF/site/$SITE/host/$HOST/            # host scope
+make_new_dirs $CONF/site/$SITE/host/$HOST/plat/$PLAT/ # host and platform scope
+make_new_dirs $CONF_LOCAL/plat/$PLAT/                 # platform-specific local installations of software
+                                                      # or installed scripts that I didn't write
+make_new_dirs $CONF_LOCAL/site/$SITE/                 # site-specific local installations of software
+                                                      # or installed scripts that I didn't write
+make_new_dirs $CONF_LOCAL/site/$SITE/host/$HOST/      # host-specific local installations of software
+                                                      # or installed scripts that I didn't write
+make_new_dirs $CONF_LOCAL/site/$SITE/host/$HOST/plat/$PLAT  # host/platform-specific local installations of software
+                                                      # or installed scripts that I didn't write

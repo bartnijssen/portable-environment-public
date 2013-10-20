@@ -1,0 +1,32 @@
+#! /bin/bash
+# Functions to setup new configuration directory structure
+
+make_new_dirs() {
+    echo "Creating standard directory structure in $1"
+    mkdir -p $1/etc
+    mkdir -p $1/bin
+    mkdir -p $1/lib/python
+    mkdir -p $1/lib/perl
+    mkdir -p $1/lib/java
+    mkdir -p $1/man
+    mkdir -p $1/include
+    mkdir -p $1/info
+    mkdir -p $1/share/images
+    mkdir -p $1/app-defaults
+    mkdir -p $1/elisp/emacs
+    mkdir -p $1/elisp/xemacs
+    mkdir -p $1/tex/bib
+    mkdir -p $1/tex/bst
+    mkdir -p $1/tex/doc
+    mkdir -p $1/tex/inputs
+    mkdir -p $1/gnupg
+    mkdir -p $1/src
+    mkdir -p $1/log
+
+    # add files to ../etc directory
+    for file in env bashrc inputrc emacs Xmodmap Xclients procmailrc; do
+        if [ ! -e $1/etc/$file ]; then
+            touch $1/etc/$file
+        fi
+    done
+}

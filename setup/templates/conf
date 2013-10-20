@@ -1,0 +1,42 @@
+# This is a generic .conf file that supports the use of your portable unix environment
+# This file is source by $CONF/init/{dot-files}
+export CONF=$HOME/p/conf
+export CONF_SETUP=$HOME/p/setup
+export CONF_LOCAL=$HOME/p/conf-local
+export PLAT=`$CONF/common/bin/config.guess`
+
+# Get the SITE Variable
+if [ -e $HOME/.site ] ; then
+    export SITE=`cat $HOME/.site`
+else
+    if [ -e $CONF_SETUP/scopes/site_list ]; then
+        echo 'Existing sites are: '
+        cat $CONF_SETUP/scopes/site_list
+    fi
+    echo "Please Input the current SITE [main]"
+    read temp_site
+    if [ -z "$temp_site" ] ; then
+        SITE='main'
+    else
+        SITE=$temp_site
+    fi
+    echo $SITE >> $HOME/.site
+fi
+
+# HOST is set to remove the node number from the hostname idenitfier
+export HOST='host_not_known'
+if [ -e $HOME/.host ] ; then
+    export HOST=`cat $HOME/.host`
+else
+ export HOST=`perl -e'use POSIX qw(uname);$_=(uname)[1];s/\.local$//gi; s/^mg\d.*$/mg/gi;print ($_,"\n")' | cut -f1 -d.`
+fi
+
+# Check that Scopes already exist in configuration, else create them
+if grep -q "$PLAT" $CONF_SETUP/scopes/plat_list || \
+   grep -q "$SITE" $CONF_SETUP/scopes/site_list || \
+   grep -q "$HOST" $CONF_SETUP/scopes/host_list; then
+
+   exist='true'
+else
+   source $CONF_SETUP/new_scope
+fi

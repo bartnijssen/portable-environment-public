@@ -1,0 +1,6 @@
+# generic chsrc file
+
+source $HOME/.conf
+
+source $CONF/init/initialize.conf
+source $CONF/init/initialize.env
