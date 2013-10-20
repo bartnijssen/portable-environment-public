@@ -6,5 +6,6 @@ source $CONF/common/etc/bashrc
 source $CONF/site/$SITE/etc/bashrc
 source $CONF/plat/$PLAT/etc/bashrc
 source $CONF/site/$SITE/host/$HOST/etc/bashrc
+source $CONF/site/$SITE/host/$HOST/plat/$PLAT/etc/bashrc
 
 # source project bashrc files also
