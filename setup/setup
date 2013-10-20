@@ -43,8 +43,10 @@ for file in profile bashrc cshrc xsession; do
 done
 
 # Download $CONF/common/bin files
-wget -O $CONF/common/bin/config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD'
-chmod u+x $CONF/common/bin/config.guess
+if [ ! -e $CONF/common/bin/config.guess ]; then
+    wget -O $CONF/common/bin/config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD'
+    chmod u+x $CONF/common/bin/config.guess
+fi
 
 # Get the Current Scope Variables
 export PLAT=`$CONF/common/bin/config.guess`
