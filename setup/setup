@@ -11,6 +11,9 @@ export CONF=$HOME/p/conf
 export CONF_SETUP=$PWD
 export CONF_LOCAL=$HOME/p/conf-local
 
+export OLD_DOT_FILES=$CONF_SETUP/old_dot_files
+mkdir -p $OLD_DOT_FILES
+
 # Make main configuration directories
 echo "Making configuration directories"
 source $CONF_SETUP/setup_functions
@@ -32,13 +35,13 @@ for file in profile bashrc cshrc xsession; do
         echo '$HOME/.$file is already a link, moving on...'
     else
         if [[ -e $HOME/.$file ]]; then
-            mkdir -p $HOME/old_dot_files/
-            echo "Moving existing $file to $HOME/old_dot_files/"
-            mv $HOME/.$file $HOME/old_dot_files/$file
+            mkdir -p $OLD_DOT_FILES/
+            echo "Moving existing $file to $OLD_DOT_FILES/"
+            mv $HOME/.$file $OLD_DOT_FILES/$file
         fi
         # make the link
-        echo "making $file link: $HOME/.$file --> $CONF/init/profile"
-        ln -s $CONF/init/profile $HOME/.$file
+        echo "making $file link: $HOME/.$file --> $CONF/init/$file"
+        ln -s $CONF/init/$file $HOME/.$file
     fi
 done
 
@@ -107,6 +110,20 @@ if [ ! -d "$HOME/p/.git" ]; then
     git add --all
     git commit -m 'initial commit of config repository'
 fi
+
+# Run through a list of other dot files
+for file in gitconfig emacs emacs.d vimrc gitignore_global ncviewrc; do
+    if [ -e $HOME/.$file ]; then
+       echo "copying $HOME/.gitconfig to $OLD_DOT_FILES/$file"
+       cp $HOME/.gitconfig $OLD_DOT_FILES/$file
+       if [ ! -e $CONF/common/etc/$file ]; then
+            echo "moving $HOME/.$file to $CONF/common/etc/$file"
+            mv $HOME/.$file $CONF/common/etc/$file
+        fi
+    fi
+    echo "making $file link: $HOME/.$file --> $CONF/common/etc/$file"
+    ln -s $CONF/common/etc/$file $HOME/.$file
+done
 
 # Reload the shell to apply the changes
 exec $SHELL
