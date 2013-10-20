@@ -36,9 +36,9 @@ if [ -e $CONF_SETUP/scopes/site_list ]; then
         echo $SITE >> scopes/site_list
     fi
 else
-    echo "Adding current scope to $CONF_SETUP/scopes/plat_list"
+    echo "Adding current scope to $CONF_SETUP/scopes/site_list"
     mkdir -p $CONF_SETUP/scopes
-    echo $PLAT >> scopes/plat_list
+    echo $PLAT >> scopes/site_list
 fi
 if [ -e $CONF_SETUP/scopes/host_list ]; then
     if ! grep -q "$HOST" $CONF_SETUP/scopes/host_list; then
@@ -47,7 +47,7 @@ if [ -e $CONF_SETUP/scopes/host_list ]; then
         echo $HOST >> scopes/host_list
     fi
 else
-    echo "Adding current scope to $CONF_SETUP/scopes/plat_list"
+    echo "Adding current scope to $CONF_SETUP/scopes/host_list"
     mkdir -p $CONF_SETUP/scopes
-    echo $PLAT >> scopes/plat_list
+    echo $PLAT >> scopes/host_list
 fi
