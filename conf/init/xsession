@@ -1,0 +1,6 @@
+# generic xsession file
+
+source $HOME/.conf
+
+source $CONF/init/initialize.env
+source $CONF/init/initialize.bash
