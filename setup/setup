@@ -81,6 +81,12 @@ else
  export HOST=`perl -e'use POSIX qw(uname);$_=(uname)[1];s/\.local$//gi; s/^mg\d.*$/mg/gi;print ($_,"\n")' | cut -f1 -d.`
 fi
 
+if [ "$HOST" = "host_not_known" ] ; then
+    echo "ERROR:  Unable to determine host name: $HOST"
+    echo "You man set the host name in $HOME/.host"
+    exit
+fi
+
 # Make initial scope configuration directories
 echo "Making initial scope directories"
 source $CONF_SETUP/new_scope
@@ -124,6 +130,10 @@ for file in gitconfig emacs emacs.d vimrc gitignore_global ncviewrc; do
     echo "making $file link: $HOME/.$file --> $CONF/common/etc/$file"
     ln -s $CONF/common/etc/$file $HOME/.$file
 done
+
+# Remove write permissions on a few files
+chmod a-w $HOME/.site
+chmod a-w $HOME/.conf
 
 # Reload the shell to apply the changes
 exec $SHELL
