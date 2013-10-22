@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 # Functions to setup new configuration directory structure
 
 make_new_dirs() {

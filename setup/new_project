@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Setup a new project
+
+new_project=$1
+PROJECT_ROOT=$PROJECTS/$new_project/
+
+# Make sure we have the right project name
+if [ -z "$PROJECTS" ]; then
+    echo "ERROR: Environmental Variable $PROJECTS must be set"
+    exit
+fi
+
+while [ -z "$new_project" ]; do
+    echo "Enter Project Name:"
+    read new_project
+    PROJECT_ROOT=$PROJECTS/$new_project/
+done
+
+if [ -d "$PROJECT_ROOT" ]; then
+    echo "ERROR: $PROJECT_ROOT already exists"
+    exit
+fi
+
+echo 'New project will be located: $PROJECTS/$new_project/'
+
+# Make initial scope configuration directories
+echo "Making new project directories: $PROJECTS/$new_project/..."
+mkdir -p $PROJECT_ROOT/src
+mkdir -p $PROJECT_ROOT/data
+mkdir -p $PROJECT_ROOT/etc
+mkdir -p $PROJECT_ROOT/bin
+mkdir -p $PROJECT_ROOT/lib/python
+mkdir -p $PROJECT_ROOT/lib/perl
+mkdir -p $PROJECT_ROOT/lib/java
+mkdir -p $PROJECT_ROOT/adm
+mkdir -p $PROJECT_ROOT/share
+mkdir -p $PROJECT_ROOT/test
+mkdir -p $PROJECT_ROOT/tools
+mkdir -p $PROJECT_ROOT/misc
+mkdir -p $PROJECT_ROOT/old
+
+# Add documentation files
+echo "Adding documentation files..."
+for file in README CHANGES TODO VERSION PKGINFO; do
+    touch $PROJECT_ROOT/$file
+done
+
+# add files to ../etc directory
+for file in env bashrc; do
+    if [ ! -e $PROJECT_ROOT/etc/$file ]; then
+        touch $PROJECT_ROOT/etc/$file
+    fi
+done

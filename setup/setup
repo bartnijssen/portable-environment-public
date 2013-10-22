@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 # Setup a portable configuration system
 #
 # Based on the concepts layed out by Martin Blais
@@ -14,6 +14,20 @@ export CONF_LOCAL=$HOME/p/conf-local
 export OLD_DOT_FILES=$CONF_SETUP/old_dot_files
 mkdir -p $OLD_DOT_FILES
 
+# HOST is set to remove the node number from the hostname idenitfier
+export HOST='host_not_known'
+if [ -e $HOME/.host ] ; then
+    export HOST=`cat $HOME/.host`
+else
+ export HOST=`perl -e'use POSIX qw(uname);$_=(uname)[1];s/\.local$//gi; s/^mg\d.*$/mg/gi;print ($_,"\n")' | cut -f1 -d.`
+fi
+
+if [ "$HOST" = "host_not_known" ] ; then
+    echo "ERROR:  Unable to determine host name: $HOST"
+    echo "You man set the host name in $HOME/.host"
+    exit
+fi
+
 # Make main configuration directories
 echo "Making configuration directories"
 source $CONF_SETUP/setup_functions
@@ -22,28 +36,6 @@ make_new_dirs $CONF/init/                        # global init files,
                                                  # include all the scopes
 make_new_dirs $CONF/common/                      # common (shared) scope
 make_new_dirs $CONF_LOCAL/common/                # common stuff, install logs, very local
-
-# redirect dot files to look in $CONF/inixt
-# The dot files that are currently linked are
-# 1.  ~/.profile
-# 2.  ~/.bashrc
-# 3.  ~/.cshrc
-# 4.  ~/.xsession
-for file in profile bashrc cshrc xsession; do
-    # check if file is already a link
-    if [[ -h $HOME/.$file ]]; then
-        echo '$HOME/.$file is already a link, moving on...'
-    else
-        if [[ -e $HOME/.$file ]]; then
-            mkdir -p $OLD_DOT_FILES/
-            echo "Moving existing $file to $OLD_DOT_FILES/"
-            mv $HOME/.$file $OLD_DOT_FILES/$file
-        fi
-        # make the link
-        echo "making $file link: $HOME/.$file --> $CONF/init/$file"
-        ln -s $CONF/init/$file $HOME/.$file
-    fi
-done
 
 # Download $CONF/common/bin files
 if [ ! -e $CONF/common/bin/config.guess ]; then
@@ -73,19 +65,27 @@ else
 fi
 echo "Current SITE is set to: $SITE"
 
-# HOST is set to remove the node number from the hostname idenitfier
-export HOST='host_not_known'
-if [ -e $HOME/.host ] ; then
-    export HOST=`cat $HOME/.host`
-else
- export HOST=`perl -e'use POSIX qw(uname);$_=(uname)[1];s/\.local$//gi; s/^mg\d.*$/mg/gi;print ($_,"\n")' | cut -f1 -d.`
-fi
-
-if [ "$HOST" = "host_not_known" ] ; then
-    echo "ERROR:  Unable to determine host name: $HOST"
-    echo "You man set the host name in $HOME/.host"
-    exit
-fi
+# redirect dot files to look in $CONF/inixt
+# The dot files that are currently linked are
+# 1.  ~/.profile
+# 2.  ~/.bashrc
+# 3.  ~/.cshrc
+# 4.  ~/.xsession
+for file in profile bashrc cshrc xsession; do
+    # check if file is already a link
+    if [[ -h $HOME/.$file ]]; then
+        echo '$HOME/.$file is already a link, moving on...'
+    else
+        if [[ -e $HOME/.$file ]]; then
+            mkdir -p $OLD_DOT_FILES/
+            echo "Moving existing $file to $OLD_DOT_FILES/"
+            mv $HOME/.$file $OLD_DOT_FILES/$PLAT-$SITE-$HOST-$file
+        fi
+        # make the link
+        echo "making $file link: $HOME/.$file --> $CONF/init/$file"
+        ln -s $CONF/init/$file $HOME/.$file
+    fi
+done
 
 # Make initial scope configuration directories
 echo "Making initial scope directories"
@@ -134,6 +134,7 @@ done
 # Remove write permissions on a few files
 chmod a-w $HOME/.site
 chmod a-w $HOME/.conf
+chmod a-w $HOME/.host
 
 # Reload the shell to apply the changes
 exec $SHELL
