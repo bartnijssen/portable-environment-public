@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Setup a new scope ()
 
+set -e
+
 source $CONF_SETUP/setup_functions
 
 make_new_dirs $CONF/plat/$PLAT/                       # platform scope

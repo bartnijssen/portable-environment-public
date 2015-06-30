@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Setup a new project
 
+set -e
+
 new_project=$1
 PROJECT_ROOT=$PROJECTS/$new_project/
 

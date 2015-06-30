@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Setup Python Environment Using Anaconda
+# https://store.continuum.io/cshop/anaconda/
+
+set -e
+
+cd $HOME
+
+installer='anaconda_installer'
+
+if [ -d $PYENV_ROOT ] ; then
+    rm -rf $PYENV_ROOT
+fi
+
+# SET THE PROMPT
+if [ $PLAT = 'x86_64-apple-darwin13.1.0' ]; then
+    curl -o $installer http://09c8d0b2229f813c1b93-c95ac804525aac4b6dba79b00b39d1d3.r79.cf1.rackcdn.com/Anaconda-1.9.1-MacOSX-x86_64.sh
+elif [ $PLAT = 'x86_64-unknown-linux-gnu' ]; then
+    curl -o $installer  http://09c8d0b2229f813c1b93-c95ac804525aac4b6dba79b00b39d1d3.r79.cf1.rackcdn.com/Anaconda-1.9.1-Linux-x86_64.sh
+else
+    echo "unknown platform"
+    exit 0
+fi
+ 
+# Run the installer
+echo "Running the installer now...use the default settings."
+bash $installer
+
+# remove the installer
+rm $installer
+
+echo "done installing anaconda"
+conda info
+
+# Install conda packages
+conda install argcomplete

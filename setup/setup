@@ -7,6 +7,8 @@
 # Written by Joe Hamman, University of Washington
 # Initial Concept  -  2013-10-18
 
+set -e
+
 export CONF=$HOME/p/conf
 export CONF_SETUP=$PWD
 export CONF_LOCAL=$HOME/p/conf-local
@@ -73,8 +75,8 @@ echo "Current SITE is set to: $SITE"
 # 4.  ~/.xsession
 for file in profile bashrc cshrc xsession; do
     # check if file is already a link
-    if [[ -h $HOME/.$file ]]; then
-        echo '$HOME/.$file is already a link, moving on...'
+    if [[ -h "$HOME/.${file}" ]]; then
+        echo "${HOME}/.${file} is already a link, moving on..."
     else
         if [[ -e $HOME/.$file ]]; then
             mkdir -p $OLD_DOT_FILES/
@@ -119,16 +121,16 @@ fi
 
 # Run through a list of other dot files
 for file in gitconfig emacs emacs.d vimrc gitignore_global ncviewrc; do
-    if [ -e $HOME/.$file ]; then
-       echo "copying $HOME/.gitconfig to $OLD_DOT_FILES/$file"
-       cp $HOME/.gitconfig $OLD_DOT_FILES/$file
-       if [ ! -e $CONF/common/etc/$file ]; then
-            echo "moving $HOME/.$file to $CONF/common/etc/$file"
-            mv $HOME/.$file $CONF/common/etc/$file
-        fi
+    if [ -e "${HOME}/.${file}" ]; then
+       if [ ! -e "${CONF}/common/etc/${file}" ]; then
+            echo "copying ${HOME}/.${file} to ${CONF}/common/etc/${file}"
+            cp "${HOME}/.${file}" "${CONF}/common/etc/${file}"
+       fi
+       echo "moving $HOME/.${file} to $OLD_DOT_FILES/${file}"
+       mv -f "${HOME}/.${file}" "$OLD_DOT_FILES/${file}"
     fi
-    echo "making $file link: $HOME/.$file --> $CONF/common/etc/$file"
-    ln -s $CONF/common/etc/$file $HOME/.$file
+    echo "making ${file} link: ${HOME}/.${file} --> ${CONF}/common/etc/${file}"
+    ln -s "${CONF}/common/etc/${file}" "${HOME}/.${file}"
 done
 
 # Remove write permissions on a few files
@@ -139,3 +141,4 @@ chmod a-w $HOME/.host
 # Reload the shell to apply the changes
 exec $SHELL
 echo "Done with setup, your environment has been initialized"
+
